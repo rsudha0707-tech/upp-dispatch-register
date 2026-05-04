@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Daak Register & Tracking</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <!-- Auth View -->
+    <div id="auth-view" class="auth-container fade-in">
+        <div class="auth-card glass">
+            <h1 class="auth-title">Daak Register</h1>
+            <p class="auth-subtitle">Sign in or register to manage documents</p>
+            
+            <div id="login-section">
+                <form id="login-form">
+                    <div class="form-group">
+                        <label class="form-label">Username</label>
+                        <input type="text" id="username" class="form-input" required placeholder="Enter username">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        <input type="password" id="password" class="form-input" required placeholder="Enter password">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Sign In</button>
+                    <div id="login-error" style="color: var(--danger); margin-top: 10px; display: none;"></div>
+                    <p style="margin-top: 16px; font-size: 0.875rem;">Don't have an account? <a href="#" onclick="toggleAuthMode()" style="color: var(--accent-primary);">Register here</a></p>
+                </form>
+            </div>
+
+            <div id="test-accounts" style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border-color); text-align: left; font-size: 12px; color: var(--text-muted);">
+                <p style="margin-bottom: 8px; font-weight: 600;">Test Accounts (Password: password123):</p>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px;">
+                    <span>• spts_user (SPTS)</span>
+                    <span>• spad_user (SPAD)</span>
+                    <span>• account_user (Accountant)</span>
+                    <span>• pradhan_user (Pradhan Lipik)</span>
+                </div>
+            </div>
+
+            <div id="register-section" class="hidden">
+                <form id="register-form">
+                    <div class="form-group">
+                        <label class="form-label">Username</label>
+                        <input type="text" id="reg-username" class="form-input" required placeholder="Enter username">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" id="reg-email" class="form-input" required placeholder="Enter email">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Mobile Number</label>
+                        <input type="text" id="reg-mobile" class="form-input" required placeholder="Enter mobile number">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Role</label>
+                        <select id="reg-role" class="form-select" required>
+                            <option value="DIGTS">DIGTS</option>
+                            <option value="SPTS">SPTS</option>
+                            <option value="SPAD">SPAD</option>
+                            <option value="Accountant">Accountant</option>
+                            <option value="Pradhan Lipik">Pradhan Lipik</option>
+                            <option value="Computer Centre">Computer Centre</option>
+                            <option value="Others">Others</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        <input type="password" id="reg-password" class="form-input" required placeholder="Enter password">
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="background: var(--success);">Register</button>
+                    <div id="register-error" style="color: var(--danger); margin-top: 10px; display: none;"></div>
+                    <p style="margin-top: 16px; font-size: 0.875rem;">Already have an account? <a href="#" onclick="toggleAuthMode()" style="color: var(--accent-primary);">Sign in</a></p>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- App View -->
+    <div id="app-view" class="app-container hidden fade-in">
+        <aside class="sidebar">
+            <div class="sidebar-logo flex-between">
+                <span>DaakFlow</span>
+                <i data-lucide="send"></i>
+            </div>
+            <nav style="margin-top: 2rem;">
+                <div class="nav-item active" onclick="navigate('dashboard')">
+                    <i data-lucide="layout-dashboard"></i>
+                    Dashboard
+                </div>
+                <div class="nav-item" onclick="navigate('new-daak')">
+                    <i data-lucide="file-plus"></i>
+                    New Daak
+                </div>
+                <div class="nav-item" onclick="navigate('my-tasks')">
+                    <i data-lucide="inbox"></i>
+                    My Tasks
+                </div>
+                <div class="nav-item" onclick="navigate('all-daaks')">
+                    <i data-lucide="files"></i>
+                    All Daaks
+                </div>
+            </nav>
+            <div style="margin-top: auto;">
+                <div class="nav-item" style="color: var(--danger)" onclick="logout()">
+                    <i data-lucide="log-out"></i>
+                    Sign Out
+                </div>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <!-- Dashboard View -->
+            <div id="view-dashboard" class="view-section">
+                <div class="flex-between mb-4">
+                    <h2 class="header-title">Dashboard Overview</h2>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <button class="action-btn glass" onclick="loadDashboard()" style="margin: 0; display: flex; align-items: center; gap: 5px;">
+                            <i data-lucide="refresh-cw" style="width: 14px; height: 14px;"></i> Refresh
+                        </button>
+                        <div id="user-welcome" class="badge glass" style="padding: 8px 16px;"></div>
+                    </div>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-card glass">
+                        <span class="stat-label">Total Daak</span>
+                        <span class="stat-value" id="stat-total">0</span>
+                    </div>
+                    <div class="stat-card glass">
+                        <span class="stat-label">Pending</span>
+                        <span class="stat-value" style="color: var(--warning)" id="stat-pending">0</span>
+                    </div>
+                    <div class="stat-card glass">
+                        <span class="stat-label">Completed</span>
+                        <span class="stat-value" style="color: var(--success)" id="stat-completed">0</span>
+                    </div>
+                    <div class="stat-card glass">
+                        <span class="stat-label">My Assigned Tasks</span>
+                        <span class="stat-value" style="color: var(--accent-secondary)" id="stat-mytasks">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- New Daak View -->
+            <div id="view-new-daak" class="view-section hidden">
+                <h2 class="header-title mb-4">Register New Daak</h2>
+                <div class="glass" style="padding: 24px; max-width: 600px;">
+                    <form id="daak-form">
+                        <div class="form-group">
+                            <label class="form-label">Letter No</label>
+                            <input type="text" id="daak-letter-no" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Subject</label>
+                            <input type="text" id="daak-subject" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Sender</label>
+                            <input type="text" id="daak-sender" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Department</label>
+                            <input type="text" id="daak-department" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Initial Recipient</label>
+                            <select id="daak-routing" class="form-select" required>
+                                <option value="" disabled selected>Select Recipient</option>
+                                <!-- Users populated here -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Remarks / Instructions</label>
+                            <textarea id="daak-remarks" class="form-input" rows="3"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Attachment (PDF, Image, DOC)</label>
+                            <input type="file" id="daak-file" class="form-input">
+                        </div>
+                        <button type="submit" class="btn btn-primary mt-4">Create & Send Daak</button>
+                    </form>
+                </div>
+            </div>
+
+            <div id="view-my-tasks" class="view-section hidden">
+                <div class="flex-between mb-4">
+                    <h2 class="header-title">My Tasks</h2>
+                    <button class="action-btn glass" onclick="loadMyTasks()" style="display: flex; align-items: center; gap: 5px;">
+                        <i data-lucide="refresh-cw" style="width: 14px; height: 14px;"></i> Refresh
+                    </button>
+                </div>
+                <div class="table-container">
+                    <table id="my-tasks-table">
+                        <thead>
+                            <tr>
+                                <th>Daak ID</th>
+                                <th>Letter No</th>
+                                <th>Subject</th>
+                                <th>Sender</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="view-all-daaks" class="view-section hidden">
+                <div class="flex-between mb-4">
+                    <h2 class="header-title">All Daaks Tracker</h2>
+                    <button class="action-btn glass" onclick="loadAllDaaks()" style="display: flex; align-items: center; gap: 5px;">
+                        <i data-lucide="refresh-cw" style="width: 14px; height: 14px;"></i> Refresh
+                    </button>
+                </div>
+                <div class="table-container">
+                    <table id="all-daaks-table">
+                        <thead>
+                            <tr>
+                                <th>Daak ID</th>
+                                <th>Letter No</th>
+                                <th>Subject</th>
+                                <th>Sender</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th>Current Recipient</th>
+                                <th>History</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- History View -->
+            <div id="view-history" class="view-section hidden">
+                <div class="flex-between mb-4">
+                    <h2 class="header-title">Tracking History</h2>
+                    <button class="action-btn glass" onclick="navigate('all-daaks')">Back</button>
+                </div>
+                <div class="glass history-timeline" id="history-container">
+                    <!-- History populated here -->
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Action Modal -->
+    <div id="action-modal" class="hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 100; display: flex; align-items: center; justify-content: center;">
+        <div class="glass" style="padding: 24px; width: 100%; max-width: 400px;">
+            <h3 style="margin-bottom: 16px" id="modal-title">Process Daak</h3>
+            <div class="form-group" id="forward-group" style="display: none;">
+                <label class="form-label">Select Next Recipient</label>
+                <select id="action-next-recipient" class="form-select">
+                    <!-- Users populated here -->
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Remarks / Instructions</label>
+                <textarea id="action-comments" class="form-input" rows="3"></textarea>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn glass" onclick="closeModal()" style="flex: 1">Cancel</button>
+                <button class="btn btn-primary" id="modal-confirm-btn" style="flex: 1">Submit Action</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>
